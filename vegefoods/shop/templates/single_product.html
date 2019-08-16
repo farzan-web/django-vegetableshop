@@ -1,0 +1,112 @@
+
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+<section class="ftco-section">
+    	<div class="container">
+    		<div class="row">
+            {% for Vegtables in vegtable %}
+				{% if Vegtables.pk|add:"0" == pk|add:"0" %}
+                    <div class="col-lg-6 mb-5 ftco-animate">
+                        <a href="/{{ Vegtables.image }}" class="image-popup"><img src="/{{ Vegtables.image }}" class="img-fluid" alt="Colorlib Template">
+                        {% if Vegtables.Discount > 0 %}
+                                <span class="status" style="position: absolute; top: 0px; left: 0px; color: rgb(255, 255, 255); font-weight: 300; font-size: 12px; padding: 2px 10px; background: rgb(130, 174, 70);">{{ Vegtables.Discount }}%</span>
+                            {% endif %}
+                                <div class="overlay"></div>
+                        </a>
+                    </div>
+                    <div class="col-lg-6 product-details pl-md-5 ftco-animate">
+                        <h3>{{ Vegtables.title }}</h3>
+
+                        {% if Vegtables.Discount > 0 %}
+                            <p class="price"><span class="mr-2 price-dc" style="text-decoration: line-through;color: #b3b3b3;">${{ Vegtables.prise }}</span><span class="price-sale">${{ Vegtables.discount_prise }}</span></p>
+                        {% else %}
+                            <p class="price"><span>${{ Vegtables.prise }}</span></p>
+                        {% endif %}
+                        
+                        <p>{{ Vegtables.detail }}</p>
+
+                        <p style="color:black;margin-bottom:0px">Quantity:</p>
+                        <input id="num" style="padding-left:5px" type="number" name="count" value="1" class="vIntegerField" min="1" required="" onKeyDown="return false">
+                            <br><br>
+                        <p><a id="link" href="{% url 'cart:add_to_cart' pk=Vegtables.pk qnt=1 %}" class="btn btn-black py-3 px-5">Add to Cart</a></p>
+                    </div>
+                {% endif %}
+			{% endfor %}
+    		</div>
+    	</div>
+    </section>
+
+    <section class="ftco-section">
+    	<div class="container">
+				<div class="row justify-content-center mb-3 pb-3">
+          <div class="col-md-12 heading-section text-center ftco-animate">
+          	<span class="subheading">Today's Deals</span>
+            <h2 class="mb-4">Our Products</h2>
+            <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia</p>
+          </div>
+        </div>   		
+    	</div>
+    	<div class="container">
+    		<div class="row">
+    			{% for Vegtables in vegtable %}
+					{% if Vegtables.Discount > 0 %}
+						<div class="col-md-6 col-lg-3 ftco-animate">
+							<div class="product">
+								<a href="{% url 'shop:single_product' pk=Vegtables.pk %}" class="img-prod"><img class="img-fluid" src="/{{ Vegtables.image }}" alt="Colorlib Template">
+								{% if Vegtables.Discount > 0 %}
+									<span class="status">{{ Vegtables.Discount }}%</span>
+								{% endif %}
+									<div class="overlay"></div>
+								</a>
+								<div class="text py-3 pb-4 px-3 text-center">
+									<h3><a href="#">{{ Vegtables.title }}</a></h3>
+									<div class="d-flex">
+										<div class="pricing">
+										{% if Vegtables.Discount > 0 %}
+											<p class="price"><span class="mr-2 price-dc">${{ Vegtables.prise }}</span><span class="price-sale">${{ Vegtables.discount_prise }}</span></p>
+										{% else %}
+											<p class="price"><span>${{ Vegtables.prise }}</span></p>
+										{% endif %}
+										</div>
+									</div>
+									<div class="bottom-area d-flex px-3">
+										<div class="m-auto d-flex">
+											<a href="{% url 'shop:single_product' pk=Vegtables.pk %}" class="add-to-cart d-flex justify-content-center align-items-center text-center">
+												<span><i class="ion-ios-menu"></i></span>
+											</a>
+											<a href="{% url 'cart:addone' pk=Vegtables.pk pg=3 %}" class="buy-now d-flex justify-content-center align-items-center mx-1">
+												<span><i class="ion-ios-cart"></i></span>
+											</a>
+											{% for Whislist in wishlist %}
+												{% if user ==  Whislist.user %}
+													{% if Vegtables ==  Whislist.vegtable %}
+														{% if Whislist.wish ==  True %}
+															<style>
+																a[href="{% url 'cart:addwish' pk=Vegtables.pk pg=3 %}"] {
+																	color:#CB4335 !important;
+																}
+															</style>
+														{% endif %}
+													{% endif %}
+												{% endif %}
+											{% endfor %}
+											<a href="{% url 'cart:addwish' pk=Vegtables.pk pg=3 %}" class="heart d-flex justify-content-center align-items-center ">
+												<span><i class="ion-ios-heart"></i></span>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				{% endfor %}
+    		</div>
+    	</div>
+    </section>
+
+{% endblock content %}
+
+

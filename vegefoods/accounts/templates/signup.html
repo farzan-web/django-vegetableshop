@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<br><br><br>
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            {% if user.is_authenticated %}
+	          <p align="center">You already Signed-in <a href="{% url 'accounts:logout' %}" class="btn btn-link">Logout?</a></p>
+            {% else %}
+            <h2>Sign Up</h2>
+	        <form method="POST">
+                {% csrf_token %}
+                {{ user_form|crispy }}
+                {{ profile_form|crispy }}
+                <input type="submit" value="Sign Up" class="btn btn-primary">
+            </form>
+			<p align="center"><a href="{% url 'accounts:login' %}" class="btn btn-link">Already have an account? Sign-In</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<br><br><br>
+{% endblock %}

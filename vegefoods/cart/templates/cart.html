@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% block content %}
+    <section class="ftco-section ftco-cart">
+			<div class="container">
+				<div class="row">
+    			<div class="col-md-12 ftco-animate">
+    				<div class="cart-list">
+	    				<table class="table">
+						    <thead class="thead-primary">
+						      <tr class="text-center">
+						        <th>&nbsp;</th>
+						        <th>Product name</th>
+						        <th>Detail</th>
+						        <th>Price</th>
+						        <th>Quantity</th>
+						        <th>Total</th>
+						      </tr>
+						    </thead>
+						    <tbody>
+							{% for key, value in request.session.cart.items %}
+								{% if 'cart' in request.session %}
+									{% for Vegtables in vegtable %}
+										{% if Vegtables.pk|add:"0" == key|add:"0" %}
+											<tr class="text-center">
+												<td class="product-remove"><a href={% url 'cart:remove' pk=Vegtables.pk %}><span class="ion-ios-close"></span></a></td>
+												
+												<td class="image-prod"><a href="{% url 'shop:single_product' pk=Vegtables.pk %}"><div class="img" style="background-image:url(/{{ Vegtables.image }});"></div></a></td>
+												
+												<td class="product-name">
+													<h3>{{ Vegtables.title }}</h3>
+													<p>{{ Vegtables.detail }}</p>
+												</td>
+												
+													{% if Vegtables.Discount > 0 %}
+														<td class="price"><span name="subtotal" class="mr-2 price-dc" style="text-decoration: line-through;color: #b3b3b3;">${{ Vegtables.prise }}</span><span class="price-sale">${{ Vegtables.discount_prise }}</span></td>
+													{% else %}
+														<td class="price"><span name="subtotal">${{ Vegtables.prise }}</span></td>
+													{% endif %}
+
+												<td class="quantity">
+													<div class="input-group mb-3">
+													<input type="text" name="quantity" class="quantity form-control input-number" value="{{ value }}" min="1" max="100" readonly>
+													</div>
+												</td>
+												
+												<td name="total" class="total">${% widthratio  Vegtables.discount_prise 1 value %}</td>
+												{% comment %} <td class="total">$awd</td> {% endcomment %}
+											</tr><!-- END TR-->
+										{% endif %}
+									{% endfor %}
+								{% endif %}
+							{% endfor %}
+						    </tbody>
+						  </table>
+					  </div>
+    			</div>
+    		</div>
+    		<div class="row justify-content-end">
+				{% if user.is_authenticated %}
+							<div class="col-lg-8 mt-5 cart-wrap ftco-animate">
+								<div class="cart-total mb-3">
+									<h3>State/country:</h3>
+									<p>{{ user.profile.state_country }}</p>
+								</div>
+								<div class="cart-total mb-3">
+									<h3>Address:</h3>
+									<p>{{ user.profile.address }}</p>
+								</div>
+								<div class="cart-total mb-3">
+									<h3>Phone number:</h3>
+									<p>{{ user.profile.phone_number }}</p>
+								</div>
+							</div>
+				{% else %}
+					<div class="col-lg-8 mt-5 cart-wrap ftco-animate">
+						<div class="cart-total mb-3">
+							<h3 align="center">Please Login to your account</h3>
+						</div>
+						<p align="center"><a href="{% url 'accounts:login' %}" class="btn btn-primary py-3 px-4">Login</a></p>
+					</div>
+
+				{% endif %}
+
+
+
+    			<div class="col-lg-4 mt-5 cart-wrap ftco-animate">
+    				<div class="cart-total mb-3">
+    					<h3>Cart Totals</h3>
+						{% if 'cart' in request.session %}
+							{% if request.session.cart.items %}
+								<p class="d-flex">
+									<span>Subtotal</span>
+									<span id="subtotal_text">$0</span>
+								</p>
+								<p class="d-flex">
+									<span>Delivery</span>
+									<span>$0</span>
+								</p>
+								<p class="d-flex">
+									<span>Discount</span>
+									<span id="discount_text">$0</span>
+								</p>
+								<hr>
+								<p class="d-flex total-price">
+									<span>Total</span>
+									<span id="total_text">$0</span>
+								</p>
+							{% else %}
+								<h3>There is no items in cart</h3>
+							{% endif %}
+						{% else %}
+							<h3>There is no items in cart</h3>
+						{% endif %}
+						</div>
+					{% if 'cart' in request.session %}
+						{% if request.session.cart.items %}
+							{% if user.is_authenticated %}
+								<p><a href="{% url 'cart:thanks' %}" class="btn btn-primary py-3 px-4">Proceed to Checkout</a></p>
+							{% endif %}
+						{% endif %}
+					{% endif %}
+    			</div>
+    		</div>
+			</div>
+		</section>
+
+		<section class="ftco-section ftco-no-pt ftco-no-pb py-5 bg-light">
+      <div class="container py-4">
+        <div class="row d-flex justify-content-center py-5">
+          <div class="col-md-6">
+          	<h2 style="font-size: 22px;" class="mb-0">Subcribe to our Newsletter</h2>
+          	<span>Get e-mail updates about our latest shops and special offers</span>
+          </div>
+          <div class="col-md-6 d-flex align-items-center">
+            <form action="#" class="subscribe-form">
+              <div class="form-group d-flex">
+                <input type="text" class="form-control" placeholder="Enter email address">
+                <input type="submit" value="Subscribe" class="submit px-3">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+	<style>
+		.ftco-cart .form-group .form-control {
+			text-align: left;
+			padding-left: 20px;
+			}
+	</style>
+	<script>
+		window.onload = function() {
+			var subTotal = 0
+			var els = document.getElementsByName('subtotal')
+			var qnt = document.getElementsByName('quantity')
+			for (var i=0, len = els.length; i<len; i++) {
+				subTotal += parseFloat(els[i].innerHTML.substr(1)) * parseFloat(qnt[i].value)
+			}
+			
+
+			var total = 0
+			var els = document.getElementsByName('total')
+			for (var i=0, len = els.length; i<len; i++) {
+				total += parseFloat(els[i].innerHTML.substr(1))
+			}
+			
+			discount = '$' + (subTotal - total)
+			document.getElementById("discount_text").innerHTML = discount;
+
+			subTotal = '$' + subTotal
+			document.getElementById("subtotal_text").innerHTML = subTotal;
+
+			total = '$' + total
+			document.getElementById("total_text").innerHTML = total;
+
+		}
+	</script>
+{% endblock content %}
